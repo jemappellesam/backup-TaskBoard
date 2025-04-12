@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela Administrativa</title>
+    <link href="/css/admin.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <header>
+        <h1>📌 Tela Administrativa</h1>
+    </header>
+
+    <form class="task-form" method="POST" action="/submit-task">
+        <label for="task">Nova Tarefa:</label>
+        <input type="text" id="task" name="task" placeholder="Digite a nova tarefa..." required>
+        <div id="error-message" class="error-message"></div>
+        <button type="submit" class="submit-button">✅ Adicionar Tarefa</button>
+    </form>
+
+    <div id="notification" class="notification-hidden"></div>
+
+    <div class="task-list-container">
+        <h2 class="list-title">Todas as Tarefas</h2>
+        <div class="task-list-header">
+            <span class="header-item task-content-header">Tarefa</span>
+            <span class="header-item status-header">Status</span>
+            <span class="header-item actions-header">Ações</span>
+        </div>
+        
+        <div class="task-list">
+            <% tasks.forEach(task => { %>
+                <div class="task-item" data-task-id="<%= task.id %>">
+                    <span class="task-content"><%= task.content %></span>
+                    <span class="task-status"><%= task.status %></span>
+                    <form action="/delete-task" method="POST" class="delete-form">
+                        <input type="hidden" name="task" value="<%= task.content %>">
+                        <button type="submit" class="delete-btn">× Excluir</button>
+                    </form>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // Atualização de status em tempo real
+        socket.on('task-status-updated', (data) => {
+            const taskItem = document.querySelector(`[data-task-id="${data.taskId}"]`);
+            if(taskItem) {
+                const statusElement = taskItem.querySelector('.task-status');
+                if(statusElement) {
+                    statusElement.textContent = data.newStatus;
+                    statusElement.className = `task-status status-${data.newStatus}`;
+                }
+            }
+        });
+
+        // Nova tarefa em tempo real
+        socket.on('new-task', (task) => {
+            const taskList = document.querySelector('.task-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'task-item';
+            newItem.dataset.taskId = task.id;
+            newItem.innerHTML = `
+                <span class="task-content">${task.content}</span>
+                <span class="task-status status-${task.status}">${task.status}</span>
+                <form action="/delete-task" method="POST" class="delete-form">
+                    <input type="hidden" name="task" value="${task.content}">
+                    <button type="submit" class="delete-btn">× Excluir</button>
+                </form>
+            `;
+            taskList.prepend(newItem);
+        });
+
+        // Exclusão de tarefa
+        socket.on('task-deleted', (task) => {
+            const items = document.querySelectorAll('.task-item');
+            items.forEach(item => {
+                if(item.textContent.includes(task.content)) {
+                    item.remove();
+                }
+            });
+        });
+
+        // Notificações
+        socket.on('notification', (data) => {
+            const notification = document.getElementById('notification');
+            notification.textContent = data.message;
+            notification.className = `notification-${data.type}`;
+            
+            setTimeout(() => {
+                notification.className = 'notification-hidden';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

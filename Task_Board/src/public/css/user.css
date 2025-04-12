@@ -1,0 +1,200 @@
+/* user.css atualizado */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f4f7fc;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    background: linear-gradient(135deg, #d8dbe2, #ac9dbd);
+    color: black;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1400px;
+    overflow-x: auto;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.kanban-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+}
+
+#novo::before { background: #2575fc; }
+#andamento::before { background: #f4a261; }
+#concluido::before { background: #2a9d8f; }
+
+.kanban-column h2 {
+    margin: 0 0 15px 0;
+    color: #444;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+.tasks-container {
+    min-height: 400px;
+    padding: 10px;
+}
+
+.task-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    cursor: move;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-card.dragging {
+    opacity: 0.6;
+    transform: scale(0.98) rotate(2deg);
+    background: #f8f9fa;
+    border: 1px dashed #ccc;
+}
+
+.kanban-column.over {
+    background: #f8f9ff;
+    transform: scale(1.02);
+}
+
+.task-card.ghost {
+    border: 2px dashed #2575fc;
+    background: transparent;
+    box-shadow: none;
+    opacity: 0.5;
+}
+
+#notification {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    color: white;
+    z-index: 1000;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#notification::before {
+    content: '✓';
+    font-size: 1.2rem;
+}
+
+.notification-success { background: #4CAF50; }
+.notification-info { background: #2196F3; }
+.notification-warning { background: #ff9800; }
+.notification-hidden {
+    opacity: 0;
+    transform: translateY(-30px);
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .kanban-board {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .kanban-column {
+        width: 100%;
+        min-width: unset;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    #notification {
+        width: calc(100% - 40px);
+        top: 15px;
+        right: 20px;
+        left: 20px;
+    }
+}
+
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.task-card {
+    animation: cardEnter 0.4s ease-out;
+}
+
+/* Scrollbar personalizada */
+.kanban-board::-webkit-scrollbar {
+    height: 8px;
+    background: #f1f1f1;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
